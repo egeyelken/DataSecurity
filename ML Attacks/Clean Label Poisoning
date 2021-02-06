@@ -1,0 +1,193 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Accuracy of decision tree: 0.95\n",
+      "Accuracy of logistic regression: 0.9166666666666666\n",
+      "Accuracy of SVC: 0.9333333333333333\n"
+     ]
+    }
+   ],
+   "source": [
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "from sklearn.model_selection import train_test_split\n",
+    "from sklearn.preprocessing import LabelEncoder\n",
+    "from sklearn.metrics import accuracy_score, confusion_matrix, precision_score,recall_score\n",
+    "from sklearn.tree import DecisionTreeClassifier\n",
+    "from sklearn.ensemble import RandomForestClassifier\n",
+    "from sklearn.linear_model import LogisticRegression\n",
+    "from sklearn.svm import SVC\n",
+    "\n",
+    "df = pd.read_csv('iris.csv')\n",
+    "df = df.dropna(axis=0, how='any')\n",
+    "\n",
+    "#Target Labels:\n",
+    "y = df['variety'].values\n",
+    "label_encoder = LabelEncoder() # From categorical to numerical labels\n",
+    "y = label_encoder.fit_transform(y)\n",
+    "\n",
+    "#Features\n",
+    "features = ['sepal.length','sepal.width','petal.length','petal.width']\n",
+    "X = df[features].values\n",
+    "\n",
+    "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40, random_state=0)\n",
+    "\n",
+    "# Model 1 (Decision Tree):\n",
+    "myDEC = DecisionTreeClassifier(max_depth=5, random_state=0)\n",
+    "myDEC.fit(X_train, y_train)\n",
+    "DEC_predict = myDEC.predict(X_test)\n",
+    "print('Accuracy of decision tree: ' + str(accuracy_score(y_test, DEC_predict)))\n",
+    "\n",
+    "# Model 2 (Logistic Regression):\n",
+    "myLR = LogisticRegression(penalty='l2', tol=0.0001, C=1.0, max_iter=400)\n",
+    "myLR.fit(X_train, y_train)\n",
+    "LR_predict = myLR.predict(X_test)\n",
+    "print('Accuracy of logistic regression: ' + str(accuracy_score(y_test, LR_predict)))\n",
+    "\n",
+    "# Model 3 (Support Vector):\n",
+    "mySVC = SVC(C=1.0, kernel='rbf', random_state=0)\n",
+    "mySVC.fit(X_train, y_train)\n",
+    "SVC_predict = mySVC.predict(X_test)\n",
+    "print('Accuracy of SVC: ' + str(accuracy_score(y_test, SVC_predict)))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "5.838888888888889 3.097777777777778 3.6511111111111125 1.1544444444444448\n"
+     ]
+    }
+   ],
+   "source": [
+    "m1 = 0\n",
+    "m2 = 0\n",
+    "m3 = 0\n",
+    "m4 = 0\n",
+    "\n",
+    "for i in range(len(X_train)):\n",
+    "    m1 += X_train[i][0]\n",
+    "    m2 += X_train[i][1]\n",
+    "    m3 += X_train[i][2]\n",
+    "    m4 += X_train[i][3]\n",
+    "    \n",
+    "m1 /= len(X_train)\n",
+    "m2 /= len(X_train)\n",
+    "m3 /= len(X_train)\n",
+    "m4 /= len(X_train)\n",
+    "print(m1,m2,m3,m4)\n",
+    "\n",
+    "#print(X_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "\"\\nfor n in n_set:\\n    sample = random.sample(range(len(y_train)), int(n))\\n    for s in sample:  \\n        i = random.randint(0,3)\\n        p = 0\\n        if i == 0:\\n            p = m1\\n        elif i == 1:\\n            p = m2\\n        elif i == 2:\\n            p = m3\\n        else:\\n            p = m4\\n            \\n        X_train[s][i] = abs(p-X_train[s][i]) + X_train[s][i]\\n        \\n    # Model 3 (Support Vector):\\n    mySVC = SVC(C=1.0, kernel='rbf', random_state=0)\\n    mySVC.fit(X_train, y_train)\\n    SVC_predict = mySVC.predict(X_test)\\n    print('Accuracy of SVC: ' + str(accuracy_score(y_test, SVC_predict)))\""
+      ]
+     },
+     "execution_count": 3,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "import random\n",
+    "\n",
+    "n_set = [len(y_train)*5/100, len(y_train)*10/100, len(y_train)*20/100, len(y_train)*40/100, len(y_train)*60/100]\n",
+    "\"\"\"\n",
+    "for n in n_set:\n",
+    "    sample = random.sample(range(len(y_train)), int(n))\n",
+    "    for s in sample:  \n",
+    "        i = random.randint(0,3)\n",
+    "        p = 0\n",
+    "        if i == 0:\n",
+    "            p = m1\n",
+    "        elif i == 1:\n",
+    "            p = m2\n",
+    "        elif i == 2:\n",
+    "            p = m3\n",
+    "        else:\n",
+    "            p = m4\n",
+    "            \n",
+    "        X_train[s][i] = abs(p-X_train[s][i]) + X_train[s][i]\n",
+    "        \n",
+    "    # Model 3 (Support Vector):\n",
+    "    mySVC = SVC(C=1.0, kernel='rbf', random_state=0)\n",
+    "    mySVC.fit(X_train, y_train)\n",
+    "    SVC_predict = mySVC.predict(X_test)\n",
+    "    print('Accuracy of SVC: ' + str(accuracy_score(y_test, SVC_predict)))\"\"\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Accuracy of logistic regression: 0.95\n",
+      "Accuracy of logistic regression: 0.9333333333333333\n",
+      "Accuracy of logistic regression: 0.9333333333333333\n",
+      "Accuracy of logistic regression: 0.9333333333333333\n",
+      "Accuracy of logistic regression: 0.95\n"
+     ]
+    }
+   ],
+   "source": [
+    "for n in n_set:\n",
+    "    sample = random.sample(range(len(y_train)), int(n))\n",
+    "    for s in sample:  \n",
+    "        for i in range(4):\n",
+    "            X_train[s][i] = 5 + X_train[s][i]\n",
+    "        \n",
+    "    # Model 2 (Logistic Regression):\n",
+    "    myLR = LogisticRegression(penalty='l2', tol=0.0001, C=1.0, max_iter=400)\n",
+    "    myLR.fit(X_train, y_train)\n",
+    "    LR_predict = myLR.predict(X_test)\n",
+    "    print('Accuracy of logistic regression: ' + str(accuracy_score(y_test, LR_predict)))"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
